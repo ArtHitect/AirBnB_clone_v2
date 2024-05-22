@@ -1,12 +1,15 @@
 #!/usr/bin/python3
 """
-This script starts a simple Flask web application with multiple routes and template rendering.
+This script starts a Flask web application.
 """
 
 from flask import Flask, render_template
+from models import *
+from models import storage
+
 app = Flask(__name__)
 
-# Define the route for the home page
+
 @app.route('/', strict_slashes=False)
 def index():
     """
@@ -14,7 +17,7 @@ def index():
     """
     return 'Hello HBNB!'
 
-# Define the route for /hbnb
+
 @app.route('/hbnb', strict_slashes=False)
 def hbnb():
     """
@@ -22,54 +25,62 @@ def hbnb():
     """
     return 'HBNB'
 
-# Define the route for /c/<text>
+
 @app.route('/c/<text>', strict_slashes=False)
 def cisfun(text):
     """
-    Displays 'C ' followed by the value of the text variable.
-    Underscores in the text variable are replaced with spaces.
+    Display “C ” followed by the value of the text variable.
+    Replaces underscores in the text with spaces.
     """
-    modified_text = text.replace('_', ' ')
-    return f'C {modified_text}'
+    return 'C ' + text.replace('_', ' ')
 
-# Define the route for /python and /python/<text>
+
 @app.route('/python', strict_slashes=False)
 @app.route('/python/<text>', strict_slashes=False)
 def pythoniscool(text='is cool'):
     """
-    Displays 'Python ' followed by the value of the text variable.
-    Default value is 'is cool'. Underscores in the text variable are replaced with spaces.
+    Display “Python ” followed by the value of the text variable.
+    Replaces underscores in the text with spaces.
     """
-    modified_text = text.replace('_', ' ')
-    return f'Python {modified_text}'
+    return 'Python ' + text.replace('_', ' ')
 
-# Define the route for /number/<int:n>
+
 @app.route('/number/<int:n>', strict_slashes=False)
 def imanumber(n):
     """
-    Displays 'n is a number' only if n is an integer.
+    Display “n is a number” only if n is an integer.
     """
-    return f"{n} is a number"
+    return "{:d} is a number".format(n)
 
-# Define the route for /number_template/<int:n>
+
 @app.route('/number_template/<int:n>', strict_slashes=False)
 def numbersandtemplates(n):
     """
-    Displays an HTML page only if n is an integer.
-    The HTML page is rendered using a template.
+    Display a HTML page only if n is an integer.
     """
     return render_template('5-number.html', n=n)
 
-# Define the route for /number_odd_or_even/<int:n>
+
 @app.route('/number_odd_or_even/<int:n>', strict_slashes=False)
 def numbersandevenness(n):
     """
-    Displays an HTML page only if n is an integer.
+    Display a HTML page only if n is an integer.
     Indicates whether the number is odd or even.
-    The HTML page is rendered using a template.
     """
-    evenness = 'even' if n % 2 == 0 else 'odd'
+    if n % 2 == 0:
+        evenness = 'even'
+    else:
+        evenness = 'odd'
     return render_template('6-number_odd_or_even.html', n=n, evenness=evenness)
+
+
+@app.teardown_appcontext
+def teardown_db(exception):
+    """
+    Closes the storage on teardown.
+    """
+    storage.close()
+
 
 if __name__ == '__main__':
     # Run the application on host 0.0.0.0 and port 5000
